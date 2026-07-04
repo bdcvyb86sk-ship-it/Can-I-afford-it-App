@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Statistiken – Can I Afford It?</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div id="loader" class="loader"><div class="spinner"></div></div>
+  <div id="app" class="app-container hidden">
+    <div class="topbar">
+      <h1>Statistiken</h1>
+      <button id="export-btn" class="btn btn-secondary" style="width:auto;padding:10px 16px;font-size:14px;">📥 CSV</button>
+    </div>
+
+    <div id="premium-lock" class="hidden">
+      <div class="result-card danger">
+        <span class="result-icon">🔒</span>
+        <div class="result-title">Premium Feature</div>
+        <div class="result-detail">Statistiken sind nur für Premium-Mitglieder verfügbar.</div>
+        <a href="profile.html" class="btn btn-primary" style="margin-top:12px;">Premium freischalten</a>
+      </div>
+    </div>
+
+    <div id="stats-content">
+      <!-- Monatsübersicht -->
+      <div class="card">
+        <h2>Dieser Monat</h2>
+        <div class="card-row"><span class="label">Prüfungen gesamt</span><span class="value" id="stat-total">—</span></div>
+        <div class="card-row"><span class="label">Davon Problemlos ✅</span><span class="value" id="stat-safe" style="color:#22C55E">—</span></div>
+        <div class="card-row"><span class="label">Davon Knapp ⚠️</span><span class="value" id="stat-warning" style="color:#F59E0B">—</span></div>
+        <div class="card-row"><span class="label">Davon Lieber nicht 🚫</span><span class="value" id="stat-danger" style="color:#EF4444">—</span></div>
+        <div class="card-row"><span class="label">Geprüfter Betrag</span><span class="value" id="stat-amount">—</span></div>
+      </div>
+
+      <!-- Ausgaben nach Kategorie -->
+      <div class="card">
+        <h2>Nach Kategorie</h2>
+        <canvas id="category-chart" height="260"></canvas>
+      </div>
+
+      <!-- Verlauf -->
+      <div class="card">
+        <h2>Verlauf (letzte 6 Monate)</h2>
+        <canvas id="trend-chart" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span><span>Dashboard</span></a>
+    <a href="check.html" class="nav-item"><span class="nav-icon">🛒</span><span>Prüfen</span></a>
+    <a href="history.html" class="nav-item"><span class="nav-icon">📜</span><span>Historie</span></a>
+    <a href="stats.html" class="nav-item active"><span class="nav-icon">📊</span><span>Statistiken</span></a>
+    <a href="profile.html" class="nav-item"><span class="nav-icon">👤</span><span>Profil</span></a>
+  </nav>
+
+  <script type="module" src="js/stats.js"></script>
+</body>
+</html>

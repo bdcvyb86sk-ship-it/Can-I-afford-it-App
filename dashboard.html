@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Dashboard – Can I Afford It?</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+</head>
+<body>
+  <div id="loader" class="loader">
+    <div class="spinner"></div>
+  </div>
+
+  <div id="app" class="app-container hidden">
+    <div class="topbar">
+      <div>
+        <div class="greeting" id="greeting">Hallo 👋</div>
+        <h1 id="user-name">—</h1>
+        <span id="premium-badge-slot"></span>
+      </div>
+    </div>
+
+    <!-- ONBOARDING -->
+    <div id="onboarding" class="hidden">
+      <p class="subtitle">
+        Bevor es losgeht, brauchen wir ein paar Infos zu deinen Finanzen.
+        Diese Angaben kannst du jederzeit in deinem Profil ändern.
+      </p>
+      <div id="onboarding-message" class="message"></div>
+      <form id="onboarding-form">
+        <div class="form-group">
+          <label for="ob-income">Monatliches Nettoeinkommen</label>
+          <div class="currency-input-wrapper">
+            <input type="number" id="ob-income" min="0" step="0.01" placeholder="0.00" required />
+            <span class="currency-suffix">€</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="ob-fixed">Monatliche Fixkosten</label>
+          <div class="currency-input-wrapper">
+            <input type="number" id="ob-fixed" min="0" step="0.01" placeholder="0.00" required />
+            <span class="currency-suffix">€</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="ob-savings">Monatliches Sparziel</label>
+          <div class="currency-input-wrapper">
+            <input type="number" id="ob-savings" min="0" step="0.01" placeholder="0.00" required />
+            <span class="currency-suffix">€</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="ob-balance">Aktueller Kontostand</label>
+          <div class="currency-input-wrapper">
+            <input type="number" id="ob-balance" step="0.01" placeholder="0.00" required />
+            <span class="currency-suffix">€</span>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Speichern &amp; los geht's</button>
+      </form>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div id="main-dashboard" class="hidden">
+      <div class="card budget-highlight">
+        <div class="label">Verfügbares Monatsbudget</div>
+        <div class="amount" id="available-budget">0,00 €</div>
+      </div>
+
+      <div class="card">
+        <div class="topbar" style="margin-bottom: 12px;">
+          <h2 style="margin-bottom:0;">Sparziel-Fortschritt</h2>
+          <span id="savings-percent" style="font-weight:700;">0%</span>
+        </div>
+        <div class="progress-wrapper">
+          <div class="progress-track">
+            <div class="progress-fill" id="savings-progress-fill"></div>
+          </div>
+          <div class="progress-meta">
+            <span id="savings-current">0,00 €</span>
+            <span id="savings-target">Ziel: 0,00 €</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="premium-card-slot"></div>
+
+      <div class="card">
+        <div class="card-row">
+          <span class="label">Nettoeinkommen</span>
+          <span class="value" id="display-income">0,00 €</span>
+        </div>
+        <div class="card-row">
+          <span class="label">Fixkosten</span>
+          <span class="value" id="display-fixed">0,00 €</span>
+        </div>
+        <div class="card-row">
+          <span class="label">Sparziel</span>
+          <span class="value" id="display-savings">0,00 €</span>
+        </div>
+        <div class="card-row">
+          <span class="label">Kontostand</span>
+          <span class="value" id="display-balance">0,00 €</span>
+        </div>
+      </div>
+
+      <a href="check.html" class="btn btn-primary mt-24">Kauf prüfen</a>
+    </div>
+  </div>
+
+    <nav class="bottom-nav" id="bottom-nav">
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span><span>Dashboard</span></a>
+    <a href="check.html" class="nav-item"><span class="nav-icon">🛒</span><span>Prüfen</span></a>
+    <a href="history.html" class="nav-item"><span class="nav-icon">📜</span><span>Historie</span></a>
+    <a href="stats.html" class="nav-item"><span class="nav-icon">📊</span><span>Statistiken</span></a>
+    <a href="profile.html" class="nav-item"><span class="nav-icon">👤</span><span>Profil</span></a>
+  </nav>
+
+  <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Can I Afford It?</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+</head>
+<body>
+  <div class="center-screen">
+    <div class="auth-card">
+      <div class="logo">💰</div>
+      <h1 class="app-title text-center">Can I Afford It?</h1>
+      <p class="app-subtitle">Triff smarte Kaufentscheidungen</p>
+
+      <div id="message" class="message"></div>
+
+      <!-- LOGIN FORM -->
+      <form id="login-form">
+        <div class="form-group">
+          <label for="login-email">E-Mail</label>
+          <input type="email" id="login-email" placeholder="du@beispiel.de" required autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="login-password">Passwort</label>
+          <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn btn-primary" id="login-btn">Anmelden</button>
+        <button type="button" class="btn-link" id="forgot-password-link">Passwort vergessen?</button>
+      </form>
+
+      <!-- REGISTER FORM -->
+      <form id="register-form" class="hidden">
+        <div class="form-group">
+          <label for="register-name">Name</label>
+          <input type="text" id="register-name" placeholder="Dein Name" required autocomplete="name" />
+        </div>
+        <div class="form-group">
+          <label for="register-email">E-Mail</label>
+          <input type="email" id="register-email" placeholder="du@beispiel.de" required autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="register-password">Passwort</label>
+          <input type="password" id="register-password" placeholder="Mind. 6 Zeichen" required minlength="6" autocomplete="new-password" />
+        </div>
+        <button type="submit" class="btn btn-primary" id="register-btn">Konto erstellen</button>
+      </form>
+
+      <!-- FORGOT PASSWORD FORM -->
+      <form id="forgot-form" class="hidden">
+        <div class="form-group">
+          <label for="forgot-email">E-Mail</label>
+          <input type="email" id="forgot-email" placeholder="du@beispiel.de" required autocomplete="email" />
+        </div>
+        <button type="submit" class="btn btn-primary" id="forgot-btn">Link zum Zurücksetzen senden</button>
+        <button type="button" class="btn-link" id="back-to-login-link">Zurück zum Login</button>
+      </form>
+
+      <div class="toggle-text" id="toggle-text">
+        Noch kein Konto? <button type="button" id="show-register">Registrieren</button>
+      </div>
+
+      <div class="text-center" style="margin-top: 24px; font-size: 12px;">
+        <a href="impressum.html" style="color: var(--color-text-secondary); margin-right: 12px;">Impressum</a>
+        <a href="datenschutz.html" style="color: var(--color-text-secondary);">Datenschutz</a>
+        <a href="agb.html" style="color: var(--color-text-secondary); margin-left: 12px;">AGB</a>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/auth.js"></script>
+</body>
+</html>

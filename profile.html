@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Profil – Can I Afford It?</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+</head>
+<body>
+  <div id="loader" class="loader">
+    <div class="spinner"></div>
+  </div>
+
+  <div id="app" class="app-container hidden">
+    <div class="topbar">
+      <h1>Profil</h1>
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <div id="premium-section"></div>
+
+    <form id="profile-form">
+      <div class="form-group">
+        <label for="profile-name">Name</label>
+        <input type="text" id="profile-name" required />
+      </div>
+      <div class="form-group">
+        <label for="profile-email">E-Mail</label>
+        <input type="email" id="profile-email" disabled />
+      </div>
+      <div class="form-group">
+        <label for="profile-income">Monatliches Nettoeinkommen</label>
+        <div class="currency-input-wrapper">
+          <input type="number" id="profile-income" min="0" step="0.01" required />
+          <span class="currency-suffix">€</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="profile-fixed">Monatliche Fixkosten</label>
+        <div class="currency-input-wrapper">
+          <input type="number" id="profile-fixed" min="0" step="0.01" required />
+          <span class="currency-suffix">€</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="profile-savings">Monatliches Sparziel</label>
+        <div class="currency-input-wrapper">
+          <input type="number" id="profile-savings" min="0" step="0.01" required />
+          <span class="currency-suffix">€</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="profile-balance">Aktueller Kontostand</label>
+        <div class="currency-input-wrapper">
+          <input type="number" id="profile-balance" step="0.01" required />
+          <span class="currency-suffix">€</span>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Änderungen speichern</button>
+    </form>
+
+    <button id="logout-btn" class="btn btn-danger mt-24">Abmelden</button>
+
+    <div class="text-center" style="margin-top: 24px; font-size: 12px; padding-bottom: 20px;">
+      <a href="impressum.html" style="color: var(--color-text-secondary); margin-right: 12px;">Impressum</a>
+      <a href="datenschutz.html" style="color: var(--color-text-secondary);">Datenschutz</a>
+    </div>
+  </div>
+
+  <!-- Logout Confirmation Modal -->
+  <div class="modal-overlay" id="logout-modal">
+    <div class="modal-box">
+      <h3>Abmelden?</h3>
+      <p>Du wirst aus deinem Konto abgemeldet und zur Login-Seite weitergeleitet.</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="logout-cancel">Abbrechen</button>
+        <button class="btn btn-danger" id="logout-confirm">Abmelden</button>
+      </div>
+    </div>
+  </div>
+
+    <nav class="bottom-nav" id="bottom-nav">
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span><span>Dashboard</span></a>
+    <a href="check.html" class="nav-item"><span class="nav-icon">🛒</span><span>Prüfen</span></a>
+    <a href="history.html" class="nav-item"><span class="nav-icon">📜</span><span>Historie</span></a>
+    <a href="stats.html" class="nav-item"><span class="nav-icon">📊</span><span>Statistiken</span></a>
+    <a href="profile.html" class="nav-item"><span class="nav-icon">👤</span><span>Profil</span></a>
+  </nav>
+
+  <script type="module" src="js/profile.js"></script>
+</body>
+</html>

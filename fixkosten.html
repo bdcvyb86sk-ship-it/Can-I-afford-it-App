@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Fixkosten – Can I Afford It?</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="loader" class="loader"><div class="spinner"></div></div>
+  <div id="app" class="app-container hidden">
+    <div class="topbar">
+      <h1>Fixkosten</h1>
+    </div>
+    <p class="subtitle">Trag deine monatlichen Fixkosten einzeln ein.</p>
+
+    <div id="premium-lock" class="hidden">
+      <div class="result-card danger">
+        <span class="result-icon">🔒</span>
+        <div class="result-title">Premium Feature</div>
+        <div class="result-detail">Der Fixkosten-Manager ist nur für Premium-Mitglieder verfügbar.</div>
+        <a href="profile.html" class="btn btn-primary" style="margin-top:12px;">Premium freischalten</a>
+      </div>
+    </div>
+
+    <div id="fixkosten-content">
+      <div id="message" class="message"></div>
+
+      <form id="add-form" style="display:flex;gap:10px;margin-bottom:16px;">
+        <input type="text" id="fix-name" placeholder="z. B. Miete" style="flex:1;" required />
+        <div style="position:relative;width:120px;">
+          <input type="number" id="fix-amount" min="0" step="0.01" placeholder="0.00" required style="width:100%;padding-right:28px;" />
+          <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--color-text-secondary);">€</span>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:auto;padding:0 16px;">+</button>
+      </form>
+
+      <div class="card">
+        <div id="fixkosten-list"></div>
+        <div id="fixkosten-empty" class="empty-state hidden">
+          <span class="empty-icon">📋</span>
+          <p>Noch keine Fixkosten eingetragen.</p>
+        </div>
+      </div>
+
+      <div class="card" id="total-card" style="text-align:center;">
+        <div class="label">Gesamt Fixkosten</div>
+        <div class="amount" id="fixkosten-total" style="font-size:32px;font-weight:700;margin-top:8px;">0,00 €</div>
+        <button id="sync-btn" class="btn btn-primary" style="margin-top:16px;">In Profil übernehmen</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span><span>Dashboard</span></a>
+    <a href="check.html" class="nav-item"><span class="nav-icon">🛒</span><span>Prüfen</span></a>
+    <a href="history.html" class="nav-item"><span class="nav-icon">📜</span><span>Historie</span></a>
+    <a href="stats.html" class="nav-item"><span class="nav-icon">📊</span><span>Statistiken</span></a>
+    <a href="profile.html" class="nav-item active"><span class="nav-icon">👤</span><span>Profil</span></a>
+  </nav>
+
+  <script type="module" src="js/fixkosten.js"></script>
+</body>
+</html>

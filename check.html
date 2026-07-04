@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Kauf prüfen – Can I Afford It?</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+</head>
+<body>
+  <div id="loader" class="loader">
+    <div class="spinner"></div>
+  </div>
+
+  <div id="app" class="app-container hidden">
+    <div class="topbar">
+      <h1>Kauf prüfen</h1>
+    </div>
+
+    <p class="subtitle">
+      Gib ein, was du kaufen möchtest – wir sagen dir, ob es zu deinem Budget passt.
+    </p>
+
+    <div id="free-banner"></div>
+    <div id="message" class="message"></div>
+
+    <form id="check-form">
+      <div class="form-group">
+        <label for="product-name">Produktname</label>
+        <input type="text" id="product-name" placeholder="z. B. Neue Kopfhörer" required />
+      </div>
+      <div class="form-group">
+        <label for="product-price">Preis</label>
+        <div class="currency-input-wrapper">
+          <input type="number" id="product-price" min="0" step="0.01" placeholder="0.00" required />
+          <span class="currency-suffix">€</span>
+        </div>
+        <div id="live-preview" class="live-preview hidden"></div>
+      </div>
+      <div class="form-group">
+        <label>Kategorie</label>
+        <div class="category-grid" id="category-grid">
+          <button type="button" class="category-chip selected" data-category="Sonstiges">🧩 Sonstiges</button>
+          <button type="button" class="category-chip" data-category="Elektronik">📱 Elektronik</button>
+          <button type="button" class="category-chip" data-category="Kleidung">👕 Kleidung</button>
+          <button type="button" class="category-chip" data-category="Freizeit">🎮 Freizeit</button>
+          <button type="button" class="category-chip" data-category="Reisen">✈️ Reisen</button>
+          <button type="button" class="category-chip" data-category="Wohnen">🛋️ Wohnen</button>
+          <button type="button" class="category-chip" data-category="Essen">🍔 Essen</button>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" id="check-btn">Kann ich mir das leisten?</button>
+    </form>
+
+    <div id="result-container"></div>
+  </div>
+
+    <nav class="bottom-nav" id="bottom-nav">
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span><span>Dashboard</span></a>
+    <a href="check.html" class="nav-item"><span class="nav-icon">🛒</span><span>Prüfen</span></a>
+    <a href="history.html" class="nav-item"><span class="nav-icon">📜</span><span>Historie</span></a>
+    <a href="stats.html" class="nav-item"><span class="nav-icon">📊</span><span>Statistiken</span></a>
+    <a href="profile.html" class="nav-item"><span class="nav-icon">👤</span><span>Profil</span></a>
+  </nav>
+
+  <script type="module" src="js/check.js"></script>
+</body>
+</html>

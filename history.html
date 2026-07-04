@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Historie – Can I Afford It?</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+</head>
+<body>
+  <div id="loader" class="loader">
+    <div class="spinner"></div>
+  </div>
+
+  <div id="app" class="app-container hidden">
+    <div class="topbar">
+      <h1>Historie</h1>
+    </div>
+
+    <p class="subtitle">Alle bisherigen Kaufprüfungen auf einen Blick.</p>
+
+    <div class="filter-tabs" id="filter-tabs">
+      <button class="filter-tab active" data-filter="all">Alle</button>
+      <button class="filter-tab" data-filter="safe">✅ Problemlos</button>
+      <button class="filter-tab" data-filter="warning">⚠️ Knapp</button>
+      <button class="filter-tab" data-filter="danger">🚫 Lieber nicht</button>
+    </div>
+
+    <div class="card" id="history-card">
+      <div id="history-list"></div>
+      <div id="empty-state" class="empty-state hidden">
+        <span class="empty-icon">📭</span>
+        <p>Noch keine Prüfungen vorhanden.</p>
+      </div>
+    </div>
+  </div>
+
+    <nav class="bottom-nav" id="bottom-nav">
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span><span>Dashboard</span></a>
+    <a href="check.html" class="nav-item"><span class="nav-icon">🛒</span><span>Prüfen</span></a>
+    <a href="history.html" class="nav-item"><span class="nav-icon">📜</span><span>Historie</span></a>
+    <a href="stats.html" class="nav-item"><span class="nav-icon">📊</span><span>Statistiken</span></a>
+    <a href="profile.html" class="nav-item"><span class="nav-icon">👤</span><span>Profil</span></a>
+  </nav>
+
+  <script type="module" src="js/history.js"></script>
+</body>
+</html>
