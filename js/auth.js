@@ -1,3 +1,4 @@
+
 // js/auth.js
 import { supabase } from "./supabase.js";
 
@@ -103,9 +104,9 @@ registerForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  // Profil in profiles-Tabelle anlegen
+  // Profil sofort anlegen nach Registrierung
   if (data.user) {
-    await supabase.from("profiles").insert({
+    const { error: profileError } = await supabase.from("profiles").upsert({
       id: data.user.id,
       name,
       email,
@@ -115,7 +116,11 @@ registerForm.addEventListener("submit", async (e) => {
       current_balance: 0,
       is_premium: false,
       onboarding_complete: false
-    });
+    }, { onConflict: "id" });
+
+    if (profileError) {
+      console.error("Profil anlegen fehlgeschlagen:", profileError);
+    }
   }
 
   window.location.href = "dashboard.html";
@@ -136,10 +141,7 @@ forgotForm.addEventListener("submit", async (e) => {
   if (error) {
     showMessage(translateError(error.message));
   } else {
-    showMessage(
-      "Falls ein Konto existiert, wurde eine E-Mail zum Zurücksetzen gesendet.",
-      "success"
-    );
+    showMessage("Falls ein Konto existiert, wurde eine E-Mail zum Zurücksetzen gesendet.", "success");
   }
   setLoading(btn, false, "Link zum Zurücksetzen senden");
 });
