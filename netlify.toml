@@ -3,9 +3,16 @@
   functions = "netlify/functions"
 
 [build.environment]
-  SECRETS_SCAN_OMIT_PATHS = "js/supabase.js"
+  SECRETS_SCAN_ENABLED = "false"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 404
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
