@@ -9,9 +9,8 @@ const showRegisterBtn = document.getElementById("show-register");
 const forgotLink = document.getElementById("forgot-password-link");
 const backToLoginLink = document.getElementById("back-to-login-link");
 function showMessage(text, type) {
-  type = type || "error";
   messageEl.textContent = text;
-  messageEl.className = "message show " + type;
+  messageEl.className = "message show " + (type || "error");
 }
 function clearMessage() {
   messageEl.className = "message";
@@ -26,7 +25,7 @@ function translateError(msg) {
   if (msg.includes("Invalid login credentials")) return "E-Mail oder Passwort ist fals
   if (msg.includes("User already registered")) return "Diese E-Mail wird bereits verwe
   if (msg.includes("Password should be")) return "Das Passwort muss mindestens 6 Zeich
-  return msg;
+  return "Fehler: " + msg;
 }
 function showView(view) {
   loginForm.classList.toggle("hidden", view !== "login");
@@ -35,23 +34,27 @@ function showView(view) {
   toggleText.classList.toggle("hidden", view === "forgot");
   if (view === "login") {
     toggleText.innerHTML = 'Noch kein Konto? <button type="button" id="show-register">
+    document.getElementById("show-register").addEventListener("click", function() { sh
 ch.";
 ndet.";
 en habe
 Registr
-     document.getElementById("show-register").addEventListener("click", function() { sh
-  } else if (view === "register") {
+owView(
+   } else if (view === "register") {
     toggleText.innerHTML = 'Bereits ein Konto? <button type="button" id="show-login">A
     document.getElementById("show-login").addEventListener("click", function() { showV
-  }
+}
   clearMessage();
 }
 showRegisterBtn.addEventListener("click", function() { showView("register"); });
 forgotLink.addEventListener("click", function() { showView("forgot"); });
 backToLoginLink.addEventListener("click", function() { showView("login"); });
-supabase.auth.getSession().then(function({ data: { session } }) {
-  if (session) window.location.href = "dashboard.html";
-});
+// Session prüfen
+supabase.auth.getSession().then(function(result) {
+  if (result.data && result.data.session) {
+    window.location.href = "dashboard.html";
+} });
+// Login
 loginForm.addEventListener("submit", function(e) {
   e.preventDefault();
   clearMessage();
@@ -59,58 +62,81 @@ loginForm.addEventListener("submit", function(e) {
   const password = document.getElementById("login-password").value;
   const btn = document.getElementById("login-btn");
   setLoading(btn, true, "Anmelden");
-  supabase.auth.signInWithPassword({ email, password }).then(function({ error }) {
-    if (error) {
-      showMessage(translateError(error.message));
+  supabase.auth.signInWithPassword({ email: email, password: password }).then(function
+    if (result.error) {
+      showMessage(translateError(result.error.message));
       setLoading(btn, false, "Anmelden");
     } else {
       window.location.href = "dashboard.html";
     }
+  }).catch(function(err) {
+    showMessage("Verbindungsfehler. Bitte versuche es erneut.");
+    setLoading(btn, false, "Anmelden");
 }); });
+// Registrierung
 registerForm.addEventListener("submit", function(e) {
   e.preventDefault();
   clearMessage();
   const name = document.getElementById("register-name").value.trim();
   const email = document.getElementById("register-email").value.trim();
   const password = document.getElementById("register-password").value;
-  const btn = document.getElementById("register-btn");
-  setLoading(btn, true, "Konto erstellen");
-  supabase.auth.signUp({ email, password, options: { data: { name } } }).then(function
-    if (error) {
-      showMessage(translateError(error.message));
-      setLoading(btn, false, "Konto erstellen");
-owView(
 nmelden
 iew("lo
-({ data
+(result
 
- return; }
-    if (data.user) {
+   const btn = document.getElementById("register-btn");
+  setLoading(btn, true, "Konto erstellen");
+  supabase.auth.signUp({
+    email: email,
+    password: password,
+    options: { data: { name: name } }
+  }).then(function(result) {
+    if (result.error) {
+      showMessage(translateError(result.error.message));
+      setLoading(btn, false, "Konto erstellen");
+      return;
+    }
+    if (result.data && result.data.user) {
       supabase.from("profiles").upsert({
-        id: data.user.id, name, email,
-        income: 0, fixed_costs: 0, savings_goal: 0,
-        current_balance: 0, is_premium: false, onboarding_complete: false
+        id: result.data.user.id,
+        name: name,
+        email: email,
+        income: 0,
+        fixed_costs: 0,
+        savings_goal: 0,
+        current_balance: 0,
+        is_premium: false,
+        onboarding_complete: false
       }, { onConflict: "id" }).then(function() {
+        window.location.href = "dashboard.html";
+      }).catch(function() {
         window.location.href = "dashboard.html";
 });
 } else {
       window.location.href = "dashboard.html";
     }
+  }).catch(function(err) {
+    showMessage("Verbindungsfehler. Bitte versuche es erneut.");
+    setLoading(btn, false, "Konto erstellen");
 }); });
+// Passwort vergessen
 forgotForm.addEventListener("submit", function(e) {
   e.preventDefault();
   clearMessage();
   const email = document.getElementById("forgot-email").value.trim();
   const btn = document.getElementById("forgot-btn");
   setLoading(btn, true, "Link senden");
-  supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + "/index.html"
-  }).then(function({ error }) {
-    if (error) {
-      showMessage(translateError(error.message));
+supabase.auth.resetPasswordForEmail(email, {
+ redirectTo: window.location.origin + "/index.html"
+  }).then(function(result) {
+    if (result.error) {
+      showMessage(translateError(result.error.message));
     } else {
       showMessage("Falls ein Konto existiert, wurde eine E-Mail gesendet.", "success")
-    }
+}
     setLoading(btn, false, "Link zum Zurücksetzen senden");
   });
 });
+ 
+
+ 
