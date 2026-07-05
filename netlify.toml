@@ -5,14 +5,12 @@
 [build.environment]
   SECRETS_SCAN_ENABLED = "false"
 
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Content-Type = "application/javascript; charset=utf-8"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 404
-
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
