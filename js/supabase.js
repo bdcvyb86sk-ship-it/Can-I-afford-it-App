@@ -1,4 +1,3 @@
-
 const { createClient } = window.supabase;
 
 const SUPABASE_URL = "https://frydbeywxltrqwkzfaht.supabase.co";
