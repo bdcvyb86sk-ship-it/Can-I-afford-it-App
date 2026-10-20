@@ -6,9 +6,10 @@
   SECRETS_SCAN_ENABLED = "false"
 
 [[headers]]
-  for = "/*.js"
+  for = "/*"
   [headers.values]
-    Content-Type = "application/javascript; charset=utf-8"
+    Content-Security-Policy = "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://frydbeywxltrqwkzfaht.supabase.co wss://frydbeywxltrqwkzfaht.supabase.co"
+    X-Frame-Options = "DENY"
 
 [[redirects]]
   from = "/*"
