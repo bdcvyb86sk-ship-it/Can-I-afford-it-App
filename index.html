@@ -19,7 +19,6 @@
 
       <div id="message" class="message"></div>
 
-      <!-- LOGIN FORM -->
       <form id="login-form">
         <div class="form-group">
           <label for="login-email">E-Mail</label>
@@ -33,7 +32,6 @@
         <button type="button" class="btn-link" id="forgot-password-link">Passwort vergessen?</button>
       </form>
 
-      <!-- REGISTER FORM -->
       <form id="register-form" class="hidden">
         <div class="form-group">
           <label for="register-name">Name</label>
@@ -50,13 +48,12 @@
         <button type="submit" class="btn btn-primary" id="register-btn">Konto erstellen</button>
       </form>
 
-      <!-- FORGOT PASSWORD FORM -->
       <form id="forgot-form" class="hidden">
         <div class="form-group">
           <label for="forgot-email">E-Mail</label>
           <input type="email" id="forgot-email" placeholder="du@beispiel.de" required autocomplete="email" />
         </div>
-        <button type="submit" class="btn btn-primary" id="forgot-btn">Link zum Zurücksetzen senden</button>
+        <button type="submit" class="btn btn-primary" id="forgot-btn">Reset-Link senden</button>
         <button type="button" class="btn-link" id="back-to-login-link">Zurück zum Login</button>
       </form>
 
@@ -64,14 +61,16 @@
         Noch kein Konto? <button type="button" id="show-register">Registrieren</button>
       </div>
 
-      <div class="text-center" style="margin-top: 24px; font-size: 12px;">
-        <a href="impressum.html" style="color: var(--color-text-secondary); margin-right: 12px;">Impressum</a>
-        <a href="datenschutz.html" style="color: var(--color-text-secondary);">Datenschutz</a>
-        <a href="agb.html" style="color: var(--color-text-secondary); margin-left: 12px;">AGB</a>
+      <div class="text-center" style="margin-top:24px;font-size:12px;">
+        <a href="impressum.html" style="color:var(--color-text-secondary);margin-right:12px;">Impressum</a>
+        <a href="datenschutz.html" style="color:var(--color-text-secondary);">Datenschutz</a>
+        <a href="agb.html" style="color:var(--color-text-secondary);margin-left:12px;">AGB</a>
       </div>
     </div>
   </div>
 
-  <script type="module" src="js/auth.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
 </body>
 </html>

@@ -1,78 +1,74 @@
 // js/history.js
-import { supabase } from "./supabase.js";
+var FREE_LIMIT = 3;
+var allChecks = [];
+var activeFilter = "all";
+var isPremium = false;
 
-const loader = document.getElementById("loader");
-const app = document.getElementById("app");
-const historyList = document.getElementById("history-list");
-const emptyState = document.getElementById("empty-state");
-const filterTabs = document.getElementById("filter-tabs");
+var fmt = function(v) {
+  return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(v);
+};
+var fmtDate = function(s) {
+  if (!s) return "";
+  return new Intl.DateTimeFormat("de-DE", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" }).format(new Date(s));
+};
+var statusLabels = { safe: "Problemlos", warning: "Knapp", danger: "Lieber nicht" };
+var categoryIcons = { Elektronik:"📱", Kleidung:"👕", Freizeit:"🎮", Reisen:"✈️", Wohnen:"🛋️", Essen:"🍔", Sonstiges:"🧩" };
 
-const FREE_LIMIT = 3;
-const fmt = (v) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(v);
-const fmtDate = (s) => s ? new Intl.DateTimeFormat("de-DE", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" }).format(new Date(s)) : "";
-const statusLabels = { safe: "Problemlos", warning: "Knapp", danger: "Lieber nicht" };
-const categoryIcons = { Elektronik:"📱", Kleidung:"👕", Freizeit:"🎮", Reisen:"✈️", Wohnen:"🛋️", Essen:"🍔", Sonstiges:"🧩" };
+sb.auth.getSession().then(function(result) {
+  if (!result.data || !result.data.session) { window.location.href = "index.html"; return; }
+  var userId = result.data.session.user.id;
 
-const { data: { session } } = await supabase.auth.getSession();
-if (!session) { window.location.href = "index.html"; }
+  sb.from("profiles").select("is_premium").eq("id", userId).single().then(function(res) {
+    isPremium = res.data && res.data.is_premium ? true : false;
 
-const { data: profile } = await supabase.from("profiles").select("is_premium").eq("id", session.user.id).single();
-const isPremium = profile?.is_premium || false;
+    sb.from("checks").select("*").eq("user_id", userId).order("created_at", { ascending: false }).then(function(res) {
+      allChecks = res.data || [];
+      document.getElementById("loader").classList.add("hidden");
+      document.getElementById("app").classList.remove("hidden");
+      renderList();
+    });
+  });
+});
 
-const { data: checks } = await supabase.from("checks").select("*").eq("user_id", session.user.id).order("created_at", { ascending: false });
-
-let allChecks = checks || [];
-let activeFilter = "all";
-
-loader.classList.add("hidden");
-app.classList.remove("hidden");
-renderList();
-
-filterTabs.addEventListener("click", (e) => {
-  const tab = e.target.closest(".filter-tab");
+document.getElementById("filter-tabs").onclick = function(e) {
+  var tab = e.target.closest(".filter-tab");
   if (!tab) return;
-  document.querySelectorAll(".filter-tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".filter-tab").forEach(function(t) { t.classList.remove("active"); });
   tab.classList.add("active");
   activeFilter = tab.dataset.filter;
   renderList();
-});
+};
 
 function renderList() {
-  historyList.innerHTML = "";
-  const filtered = activeFilter === "all" ? allChecks : allChecks.filter(c => c.status === activeFilter);
-  const limited = isPremium ? filtered : filtered.slice(0, FREE_LIMIT);
+  var list = document.getElementById("history-list");
+  var empty = document.getElementById("empty-state");
+  list.innerHTML = "";
 
-  if (allChecks.length === 0) { emptyState.classList.remove("hidden"); return; }
-  emptyState.classList.add("hidden");
+  var filtered = activeFilter === "all" ? allChecks : allChecks.filter(function(c) { return c.status === activeFilter; });
+  var limited = isPremium ? filtered : filtered.slice(0, FREE_LIMIT);
+
+  if (allChecks.length === 0) { empty.classList.remove("hidden"); return; }
+  empty.classList.add("hidden");
 
   if (limited.length === 0) {
-    historyList.innerHTML = `<p class="subtitle" style="text-align:center;padding:24px 0;">Keine Einträge in dieser Kategorie.</p>`;
+    list.innerHTML = '<p class="subtitle" style="text-align:center;padding:24px 0;">Keine Einträge.</p>';
     return;
   }
 
-  limited.forEach(c => {
-    const icon = categoryIcons[c.category] || "🧩";
-    const el = document.createElement("div");
+  limited.forEach(function(c) {
+    var icon = categoryIcons[c.category] || "🧩";
+    var el = document.createElement("div");
     el.className = "history-item";
-    el.innerHTML = `
-      <div class="info">
-        <div class="name">${icon} ${esc(c.product_name)}</div>
-        <div class="date">${fmtDate(c.created_at)}</div>
-        <span class="badge ${c.status}">${statusLabels[c.status] || c.status}</span>
-      </div>
-      <div class="amount">${fmt(c.purchase_amount)}</div>`;
-    historyList.appendChild(el);
+    var d = document.createElement("div"); d.textContent = c.product_name;
+    el.innerHTML = '<div class="info"><div class="name">' + icon + ' ' + d.innerHTML + '</div><div class="date">' + fmtDate(c.created_at) + '</div><span class="badge ' + c.status + '">' + (statusLabels[c.status] || c.status) + '</span></div><div class="amount">' + fmt(c.purchase_amount) + '</div>';
+    list.appendChild(el);
   });
 
   if (!isPremium && filtered.length > FREE_LIMIT) {
-    const upsell = document.createElement("div");
-    upsell.className = "premium-card"; upsell.style.marginTop = "16px";
-    upsell.innerHTML = `
-      <div class="premium-title">⭐ ${filtered.length - FREE_LIMIT} weitere Einträge</div>
-      <p style="color:var(--color-text-secondary);font-size:14px;margin-bottom:0;">Mit Premium siehst du deine komplette Historie.</p>
-      <a href="profile.html" class="btn btn-primary" style="margin-top:12px;">Premium freischalten</a>`;
-    historyList.appendChild(upsell);
+    var upsell = document.createElement("div");
+    upsell.className = "premium-card";
+    upsell.style.marginTop = "16px";
+    upsell.innerHTML = '<div class="premium-title">⭐ ' + (filtered.length - FREE_LIMIT) + ' weitere Einträge</div><p style="color:var(--color-text-secondary);font-size:14px;">Mit Premium siehst du alles.</p><a href="profile.html" class="btn btn-primary" style="margin-top:12px;">Premium freischalten</a>';
+    list.appendChild(upsell);
   }
 }
-
-function esc(str) { const d = document.createElement("div"); d.textContent = str; return d.innerHTML; }

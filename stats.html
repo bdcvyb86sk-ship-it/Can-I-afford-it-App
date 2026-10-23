@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Statistiken – Can I Afford It?</title>
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#000000" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -19,31 +21,39 @@
       <div class="result-card danger">
         <span class="result-icon">🔒</span>
         <div class="result-title">Premium Feature</div>
-        <div class="result-detail">Statistiken sind nur für Premium-Mitglieder verfügbar.</div>
-        <a href="profile.html" class="btn btn-primary" style="margin-top:12px;">Premium freischalten</a>
+        <div class="result-detail">Statistiken sind nur für Premium-Mitglieder.</div>
+        <div style="margin-top:16px;">
+          <a href="https://www.checkout-ds24.com/product/705081" target="_blank" class="plan-option" style="margin-bottom:10px;display:flex;">
+            <div class="plan-left"><span class="plan-name">Monatlich</span><span class="plan-sub">Jederzeit kündbar</span></div>
+            <div class="plan-price">4,99 €<span class="plan-period">/ Monat</span></div>
+          </a>
+          <a href="https://www.checkout-ds24.com/product/707747" target="_blank" class="plan-option recommended" style="margin-bottom:10px;display:flex;">
+            <div class="plan-left"><span class="plan-name">Jährlich <span class="plan-tag">SPARE 33%</span></span><span class="plan-sub">39,99 € pro Jahr</span></div>
+            <div class="plan-price">3,33 €<span class="plan-period">/ Monat</span></div>
+          </a>
+          <a href="https://www.checkout-ds24.com/product/707752" target="_blank" class="plan-option" style="display:flex;">
+            <div class="plan-left"><span class="plan-name">Forever</span><span class="plan-sub">Einmalzahlung</span></div>
+            <div class="plan-price">69 €<span class="plan-period">einmalig</span></div>
+          </a>
+        </div>
       </div>
     </div>
 
     <div id="stats-content">
-      <!-- Monatsübersicht -->
       <div class="card">
         <h2>Dieser Monat</h2>
         <div class="card-row"><span class="label">Prüfungen gesamt</span><span class="value" id="stat-total">—</span></div>
-        <div class="card-row"><span class="label">Davon Problemlos ✅</span><span class="value" id="stat-safe" style="color:#22C55E">—</span></div>
-        <div class="card-row"><span class="label">Davon Knapp ⚠️</span><span class="value" id="stat-warning" style="color:#F59E0B">—</span></div>
-        <div class="card-row"><span class="label">Davon Lieber nicht 🚫</span><span class="value" id="stat-danger" style="color:#EF4444">—</span></div>
+        <div class="card-row"><span class="label">Problemlos ✅</span><span class="value" id="stat-safe" style="color:#22C55E">—</span></div>
+        <div class="card-row"><span class="label">Knapp ⚠️</span><span class="value" id="stat-warning" style="color:#F59E0B">—</span></div>
+        <div class="card-row"><span class="label">Lieber nicht 🚫</span><span class="value" id="stat-danger" style="color:#EF4444">—</span></div>
         <div class="card-row"><span class="label">Geprüfter Betrag</span><span class="value" id="stat-amount">—</span></div>
       </div>
-
-      <!-- Ausgaben nach Kategorie -->
       <div class="card">
         <h2>Nach Kategorie</h2>
         <canvas id="category-chart" height="260"></canvas>
       </div>
-
-      <!-- Verlauf -->
       <div class="card">
-        <h2>Verlauf (letzte 6 Monate)</h2>
+        <h2>Verlauf (6 Monate)</h2>
         <canvas id="trend-chart" height="200"></canvas>
       </div>
     </div>
@@ -57,6 +67,8 @@
     <a href="profile.html" class="nav-item"><span class="nav-icon">👤</span><span>Profil</span></a>
   </nav>
 
-  <script type="module" src="js/stats.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/stats.js"></script>
 </body>
 </html>

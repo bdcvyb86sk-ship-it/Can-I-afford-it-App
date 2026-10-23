@@ -1,97 +1,81 @@
 // js/fixkosten.js
-import { supabase } from "./supabase.js";
-
-const loader = document.getElementById("loader");
-const app = document.getElementById("app");
-const premiumLock = document.getElementById("premium-lock");
-const fixkostenContent = document.getElementById("fixkosten-content");
-const addForm = document.getElementById("add-form");
-const fixkostenList = document.getElementById("fixkosten-list");
-const fixkostenEmpty = document.getElementById("fixkosten-empty");
-const fixkostenTotal = document.getElementById("fixkosten-total");
-const syncBtn = document.getElementById("sync-btn");
-const messageEl = document.getElementById("message");
-
-const fmt = (v) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(v || 0);
+var fmt = function(v) {
+  return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(v || 0);
+};
+var fixkostenItems = [];
+var currentUserId = null;
 
 function showToast(text) {
-  const t = document.createElement("div"); t.className = "toast"; t.textContent = text;
+  var t = document.createElement("div"); t.className = "toast"; t.textContent = text;
   document.body.appendChild(t);
-  requestAnimationFrame(() => t.classList.add("show"));
-  setTimeout(() => { t.classList.remove("show"); setTimeout(() => t.remove(), 250); }, 2200);
+  requestAnimationFrame(function() { t.classList.add("show"); });
+  setTimeout(function() { t.classList.remove("show"); setTimeout(function() { t.remove(); }, 250); }, 2200);
 }
 
-const { data: { session } } = await supabase.auth.getSession();
-if (!session) { window.location.href = "index.html"; }
+sb.auth.getSession().then(function(result) {
+  if (!result.data || !result.data.session) { window.location.href = "index.html"; return; }
+  currentUserId = result.data.session.user.id;
 
-const { data: profile } = await supabase.from("profiles").select("is_premium").eq("id", session.user.id).single();
-const isPremium = profile?.is_premium || false;
+  sb.from("profiles").select("is_premium").eq("id", currentUserId).single().then(function(res) {
+    var isPremium = res.data && res.data.is_premium;
+    document.getElementById("loader").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
 
-loader.classList.add("hidden");
-app.classList.remove("hidden");
+    if (!isPremium) {
+      document.getElementById("premium-lock").classList.remove("hidden");
+      document.getElementById("fixkosten-content").classList.add("hidden");
+      return;
+    }
+    loadFixkosten();
+  });
+});
 
-if (!isPremium) {
-  premiumLock.classList.remove("hidden");
-  fixkostenContent.classList.add("hidden");
-} else {
-  await loadFixkosten();
-}
-
-let fixkostenItems = [];
-
-async function loadFixkosten() {
-  const { data } = await supabase.from("fixkosten")
-    .select("*").eq("user_id", session.user.id).order("created_at");
-  fixkostenItems = data || [];
-  renderList();
+function loadFixkosten() {
+  sb.from("fixkosten").select("*").eq("user_id", currentUserId).order("created_at").then(function(res) {
+    fixkostenItems = res.data || [];
+    renderList();
+  });
 }
 
 function renderList() {
-  fixkostenList.innerHTML = "";
-  if (fixkostenItems.length === 0) {
-    fixkostenEmpty.classList.remove("hidden"); fixkostenTotal.textContent = "0,00 €"; return;
-  }
-  fixkostenEmpty.classList.add("hidden");
+  var list = document.getElementById("fixkosten-list");
+  var empty = document.getElementById("fixkosten-empty");
+  var total = 0;
+  list.innerHTML = "";
 
-  let total = 0;
-  fixkostenItems.forEach(item => {
+  if (fixkostenItems.length === 0) { empty.classList.remove("hidden"); document.getElementById("fixkosten-total").textContent = "0,00 €"; return; }
+  empty.classList.add("hidden");
+
+  fixkostenItems.forEach(function(item) {
     total += item.amount || 0;
-    const el = document.createElement("div");
-    el.className = "card-row";
-    el.innerHTML = `
-      <span class="label">${esc(item.name)}</span>
-      <div style="display:flex;align-items:center;gap:12px;">
-        <span class="value">${fmt(item.amount)}</span>
-        <button data-id="${item.id}" class="delete-btn" style="background:none;border:none;color:#EF4444;font-size:18px;cursor:pointer;">✕</button>
-      </div>`;
-    fixkostenList.appendChild(el);
+    var el = document.createElement("div"); el.className = "card-row";
+    var d = document.createElement("div"); d.textContent = item.name;
+    el.innerHTML = '<span class="label">' + d.innerHTML + '</span><div style="display:flex;align-items:center;gap:12px;"><span class="value">' + fmt(item.amount) + '</span><button data-id="' + item.id + '" style="background:none;border:none;color:#EF4444;font-size:18px;cursor:pointer;">✕</button></div>';
+    list.appendChild(el);
   });
 
-  fixkostenTotal.textContent = fmt(total);
-
-  document.querySelectorAll(".delete-btn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      await supabase.from("fixkosten").delete().eq("id", btn.dataset.id);
-      await loadFixkosten();
-    });
+  document.getElementById("fixkosten-total").textContent = fmt(total);
+  document.querySelectorAll("[data-id]").forEach(function(btn) {
+    btn.onclick = function() {
+      sb.from("fixkosten").delete().eq("id", btn.dataset.id).then(function() { loadFixkosten(); });
+    };
   });
 }
 
-addForm.addEventListener("submit", async (e) => {
+document.getElementById("add-form").onsubmit = function(e) {
   e.preventDefault();
-  const name = document.getElementById("fix-name").value.trim();
-  const amount = parseFloat(document.getElementById("fix-amount").value);
-  if (!name || isNaN(amount) || amount < 0) return;
+  var name = document.getElementById("fix-name").value.trim();
+  var amount = parseFloat(document.getElementById("fix-amount").value);
+  if (!name || isNaN(amount)) return;
+  sb.from("fixkosten").insert({ user_id: currentUserId, name: name, amount: amount }).then(function() {
+    document.getElementById("add-form").reset();
+    loadFixkosten();
+  });
+};
 
-  await supabase.from("fixkosten").insert({ user_id: session.user.id, name, amount });
-  addForm.reset();
-  await loadFixkosten();
-});
-
-syncBtn.addEventListener("click", async () => {
-  const total = fixkostenItems.reduce((s, i) => s + (i.amount || 0), 0);
-  await supabase.from("profiles").update({ fixed_costs: total }).eq("id", session.user.id);
-  showToast(`Fixkosten (${fmt(total)}) im Profil übernommen ✓`);
-});
-
-function esc(str) { const d = document.createElement("div"); d.textContent = str; return d.innerHTML; }
+document.getElementById("sync-btn").onclick = function() {
+  var total = fixkostenItems.reduce(function(s, i) { return s + (i.amount || 0); }, 0);
+  sb.from("profiles").update({ fixed_costs: total }).eq("id", currentUserId).then(function() {
+    showToast("Fixkosten (" + fmt(total) + ") im Profil übernommen ✓");
+  });
+};
