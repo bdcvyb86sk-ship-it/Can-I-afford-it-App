@@ -1,18 +1,22 @@
 // netlify/functions/digistore-ipn.js
 // Digistore24 Webhook/IPN -> schaltet Premium in Supabase frei bzw. wieder ab.
+// Nutzt direkt die Supabase-REST-Schnittstelle (fetch), keine zusaetzliche Bibliothek noetig.
 //
 // Netlify-Variablen:
 //   SUPABASE_URL, SUPABASE_SERVICE_KEY   (Secret Key, nur hier!)
-//   DS24_WEBHOOK_KEY                      (langer Zufallswert, steht als ?key=... in der Webhook-URL)
-//   DS24_IPN_PASSPHRASE                   (optional: nur falls Digistore eine Signatur mitschickt)
+//   DS24_WEBHOOK_KEY                      (Zufallswert, steht als ?key=... in der Webhook-URL)
+//   DS24_IPN_PASSPHRASE                   (optional, nur falls Digistore eine Signatur mitschickt)
 
 const crypto = require("crypto");
-const { createClient } = require("@supabase/supabase-js");
 
 const PRODUCT_PLANS = { "705081": "monthly", "707747": "yearly", "707752": "forever" };
 const GRANT_EVENTS = ["on_payment", "payment", "order_completed", "on_rebill_resumed", "rebill", "recurring_payment"];
 const REVOKE_EVENTS = ["on_refund", "refund", "on_chargeback", "chargeback"];
 const GRACE_DAYS = 3;
+
+function env(name) {
+  return String(process.env[name] || "").trim();
+}
 
 function parseBody(event) {
   var raw = event.body || "";
@@ -34,7 +38,7 @@ function parseBody(event) {
   return result;
 }
 
-// Signatur nach Digistore24-Dokumentation: SHA512 ueber "key=value<passphrase>" (Keys sortiert, leere Werte ausgelassen)
+// Signatur nach Digistore24-Doku: SHA512 ueber "key=value<passphrase>" (Keys sortiert, leere Werte weggelassen)
 function digistoreSignature(params, passphrase) {
   var keys = Object.keys(params)
     .filter(function (k) { return k !== "sha_sign" && k !== "SHASIGN"; })
@@ -56,10 +60,10 @@ function safeEqual(a, b) {
 }
 
 function isAuthorized(event, params) {
-  var passphrase = process.env.DS24_IPN_PASSPHRASE;
+  var passphrase = env("DS24_IPN_PASSPHRASE");
   var sign = params.sha_sign || params.SHASIGN;
   if (sign && passphrase && safeEqual(String(sign).toUpperCase(), digistoreSignature(params, passphrase))) return true;
-  var key = process.env.DS24_WEBHOOK_KEY;
+  var key = env("DS24_WEBHOOK_KEY");
   var given = event.queryStringParameters && event.queryStringParameters.key;
   if (key && given && safeEqual(given, key)) return true;
   return false;
@@ -74,69 +78,102 @@ function expiryFor(plan) {
   return d.toISOString();
 }
 
-exports.handler = async function (event) {
-  if (event.httpMethod !== "POST") return { statusCode: 405, body: "Method Not Allowed" };
-
-  var params = parseBody(event);
-  var fieldNames = Object.keys(params).join(",");
-
-  if (!isAuthorized(event, params)) {
-    console.warn("IPN abgelehnt (keine gueltige Signatur und kein gueltiger key). Felder:", fieldNames);
-    return { statusCode: 403, body: "Forbidden" };
+// --- Supabase REST ---
+async function rest(method, path, body, prefer) {
+  var base = env("SUPABASE_URL").replace(/\/+$/, "");
+  var key = env("SUPABASE_SERVICE_KEY");
+  var headers = { apikey: key, "Content-Type": "application/json" };
+  if (key.indexOf("eyJ") === 0) headers.Authorization = "Bearer " + key; // nur bei alten JWT-Keys
+  if (prefer) headers.Prefer = prefer;
+  var res = await fetch(base + "/rest/v1/" + path, {
+    method: method,
+    headers: headers,
+    body: body === undefined ? undefined : JSON.stringify(body)
+  });
+  var text = await res.text();
+  if (!res.ok) {
+    throw new Error("Supabase " + method + " " + path.split("?")[0] + " -> HTTP " + res.status + ": " + String(text).slice(0, 300));
   }
+  return text ? JSON.parse(text) : null;
+}
 
-  var eventType = params.event || "";
-  console.log("IPN:", eventType, "| Felder:", fieldNames);
-  if (eventType === "connection_test") return { statusCode: 200, body: "OK" };
-
-  var email = String(params.email || params.buyer_email || params.customer_email || params.billing_email || "").toLowerCase().trim();
-  var plan = PRODUCT_PLANS[String(params.product_id || "")] || null;
-  var supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
-
-  // Nutzer finden: erst ueber "custom" (Nutzer-ID aus dem Checkout-Link), dann ueber E-Mail
-  var userId = null;
-  var custom = String(params.custom || "").trim();
+async function findUserId(custom, email) {
   if (/^[0-9a-f-]{36}$/i.test(custom)) {
-    var byId = await supabase.from("profiles").select("id").eq("id", custom).limit(1);
-    if (byId.data && byId.data.length) userId = byId.data[0].id;
+    var a = await rest("GET", "profiles?select=id&id=eq." + encodeURIComponent(custom) + "&limit=1");
+    if (a && a.length) return a[0].id;
   }
-  if (!userId && email) {
-    var byMail = await supabase.from("profiles").select("id").eq("email", email).limit(1);
-    if (byMail.data && byMail.data.length) userId = byMail.data[0].id;
+  if (email) {
+    var b = await rest("GET", "profiles?select=id&email=eq." + encodeURIComponent(email) + "&limit=1");
+    if (b && b.length) return b[0].id;
   }
+  return null;
+}
 
-  if (!userId) {
-    var ins = await supabase.from("pending_premiums").insert({
-      email: email, event_type: eventType, order_id: String(params.order_id || ""), plan: plan, raw: params
-    });
-    if (ins.error) console.error("pending_premiums:", ins.error.message);
-    console.log("IPN: kein passendes Konto, gespeichert in pending_premiums:", email);
-    return { statusCode: 200, body: "OK (pending)" };
-  }
+exports.handler = async function (event) {
+  try {
+    if (event.httpMethod !== "POST") return { statusCode: 405, body: "Method Not Allowed" };
 
-  var res;
-  if (GRANT_EVENTS.indexOf(eventType) !== -1) {
-    if (!plan) {
-      console.warn("IPN: unbekannte product_id:", params.product_id);
-      return { statusCode: 200, body: "OK (unknown product)" };
+    var params = parseBody(event);
+    var fieldNames = Object.keys(params).join(",");
+
+    if (!isAuthorized(event, params)) {
+      console.warn("IPN abgelehnt (keine gueltige Signatur und kein gueltiger key). Felder:", fieldNames);
+      return { statusCode: 403, body: "Forbidden" };
     }
-    var now = new Date().toISOString();
-    res = await supabase.from("profiles").update({
-      is_premium: true, premium_plan: plan, premium_since: now,
-      premium_expires_at: expiryFor(plan), premium_updated_at: now
-    }).eq("id", userId);
-    console.log("Premium AN:", userId, plan, res.error ? "FEHLER " + res.error.message : "ok");
-  } else if (REVOKE_EVENTS.indexOf(eventType) !== -1) {
-    res = await supabase.from("profiles").update({
-      is_premium: false, premium_plan: null, premium_expires_at: null,
-      premium_updated_at: new Date().toISOString()
-    }).eq("id", userId);
-    console.log("Premium AUS:", userId, res.error ? "FEHLER " + res.error.message : "ok");
-  } else {
-    console.log("IPN: Event ohne Aktion:", eventType);
-    return { statusCode: 200, body: "OK" };
-  }
 
-  if (res && res.error) return { statusCode: 500, body: "DB error" };
-  return { statusCode: 200, body: "OK" };
+    var eventType = String(params.event || "");
+    console.log("IPN:", eventType, "| Felder:", fieldNames);
+    if (eventType === "connection_test") return { statusCode: 200, body: "OK" };
+
+    var missing = ["SUPABASE_URL", "SUPABASE_SERVICE_KEY"].filter(function (n) { return !env(n); });
+    if (missing.length) {
+      console.error("Fehlende Netlify-Variablen:", missing.join(", "));
+      return { statusCode: 500, body: "Config error" };
+    }
+
+    var email = String(params.email || params.buyer_email || params.customer_email || params.billing_email || "").toLowerCase().trim();
+    var plan = PRODUCT_PLANS[String(params.product_id || "")] || null;
+    var custom = String(params.custom || "").trim();
+
+    var userId = await findUserId(custom, email);
+
+    if (!userId) {
+      try {
+        await rest("POST", "pending_premiums", {
+          email: email, event_type: eventType, order_id: String(params.order_id || ""), plan: plan, raw: params
+        }, "return=minimal");
+      } catch (e) {
+        console.error("pending_premiums:", e.message);
+      }
+      console.log("IPN: kein passendes Konto, gespeichert in pending_premiums:", email);
+      return { statusCode: 200, body: "OK (pending)" };
+    }
+
+    if (GRANT_EVENTS.indexOf(eventType) !== -1) {
+      if (!plan) {
+        console.warn("IPN: unbekannte product_id:", params.product_id);
+        return { statusCode: 200, body: "OK (unknown product)" };
+      }
+      var now = new Date().toISOString();
+      await rest("PATCH", "profiles?id=eq." + encodeURIComponent(userId), {
+        is_premium: true, premium_plan: plan, premium_since: now,
+        premium_expires_at: expiryFor(plan), premium_updated_at: now
+      }, "return=minimal");
+      console.log("Premium AN:", userId, plan);
+    } else if (REVOKE_EVENTS.indexOf(eventType) !== -1) {
+      await rest("PATCH", "profiles?id=eq." + encodeURIComponent(userId), {
+        is_premium: false, premium_plan: null, premium_expires_at: null,
+        premium_updated_at: new Date().toISOString()
+      }, "return=minimal");
+      console.log("Premium AUS:", userId);
+    } else {
+      console.log("IPN: Event ohne Aktion:", eventType);
+    }
+
+    return { statusCode: 200, body: "OK" };
+  } catch (err) {
+    console.error("IPN Fehler:", err && err.stack ? err.stack : String(err));
+    return { statusCode: 500, body: "Server error" };
+  }
 };
+
