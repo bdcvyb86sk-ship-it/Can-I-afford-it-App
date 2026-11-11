@@ -16,8 +16,8 @@ sb.auth.getSession().then(function(result) {
   if (!result.data || !result.data.session) { window.location.href = "index.html"; return; }
   currentUserId = result.data.session.user.id;
 
-  sb.from("profiles").select("is_premium").eq("id", currentUserId).single().then(function(res) {
-    var isPremium = res.data && res.data.is_premium;
+  sb.from("profiles").select("is_premium, premium_expires_at").eq("id", currentUserId).single().then(function(res) {
+    var isPremium = isPremiumActive(res.data);
     document.getElementById("loader").classList.add("hidden");
     document.getElementById("app").classList.remove("hidden");
 

@@ -103,7 +103,7 @@ function renderDashboard(p) {
 
   var slot = document.getElementById("premium-card-slot");
   var badge = document.getElementById("premium-badge-slot");
-  if (p.is_premium) {
+  if (isPremiumActive(p)) {
     badge.innerHTML = '<span class="premium-badge">⭐ Premium</span>';
     slot.innerHTML = "";
   } else {

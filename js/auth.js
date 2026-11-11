@@ -94,12 +94,12 @@ document.getElementById("forgot-form").onsubmit = function(e) {
   btn.textContent = "Bitte warten…";
 
   sb.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + "/index.html"
+    redirectTo: new URL("reset.html", window.location.href).href
   }).then(function(result) {
     if (result.error) {
       showMessage("Fehler: " + result.error.message);
     } else {
-      showMessage("Reset-Link wurde gesendet!", "success");
+      showMessage("Falls ein Konto existiert, wurde ein Link gesendet. Keine Mail erhalten? Prüfe den Spam-Ordner oder schreibe an Worldfinancemovement@outlook.de.", "success");
     }
     btn.disabled = false;
     btn.textContent = "Reset-Link senden";

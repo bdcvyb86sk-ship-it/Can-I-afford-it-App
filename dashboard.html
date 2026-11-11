@@ -7,10 +7,17 @@
   <link rel="stylesheet" href="css/style.css" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#000000" />
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Can I Afford It" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 </head>
 <body>
   <div id="loader" class="loader"><div class="spinner"></div></div>
   <div id="app" class="app-container hidden">
+    <div class="brand-header"><img src="images/logo.png" alt="Can I Afford It" class="brand-logo brand-logo-sm" width="1106" height="1006" /></div>
     <div class="topbar">
       <div>
         <div class="greeting">Hallo 👋</div>
@@ -83,6 +90,7 @@
         <div class="card-row"><span class="label">Kontostand</span><span class="value" id="display-balance">0,00 €</span></div>
       </div>
       <a href="check.html" class="btn btn-primary mt-24">Kauf prüfen</a>
+      <a href="fixkosten.html" class="btn btn-secondary">⭐ Fixkosten-Manager</a>
     </div>
   </div>
 

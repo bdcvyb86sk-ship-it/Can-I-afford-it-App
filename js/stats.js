@@ -7,12 +7,14 @@ sb.auth.getSession().then(function(result) {
   if (!result.data || !result.data.session) { window.location.href = "index.html"; return; }
   var userId = result.data.session.user.id;
 
-  sb.from("profiles").select("is_premium").eq("id", userId).single().then(function(res) {
-    var isPremium = res.data && res.data.is_premium ? true : false;
+  sb.from("profiles").select("is_premium, premium_expires_at").eq("id", userId).single().then(function(res) {
+    var isPremium = isPremiumActive(res.data);
     document.getElementById("loader").classList.add("hidden");
     document.getElementById("app").classList.remove("hidden");
 
     if (!isPremium) {
+      var cp = "?email=" + encodeURIComponent(result.data.session.user.email || "") + "&custom=" + encodeURIComponent(userId);
+      document.querySelectorAll("#premium-lock a.plan-option").forEach(function(a) { a.href = a.href + cp; });
       document.getElementById("premium-lock").classList.remove("hidden");
       document.getElementById("stats-content").classList.add("hidden");
       document.getElementById("export-btn").classList.add("hidden");

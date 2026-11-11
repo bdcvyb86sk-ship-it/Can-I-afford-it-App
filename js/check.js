@@ -46,7 +46,7 @@ sb.auth.getSession().then(function(result) {
         document.getElementById("loader").classList.add("hidden");
         document.getElementById("app").classList.remove("hidden");
 
-        if (!profile.is_premium) {
+        if (!isPremiumActive(profile)) {
           var remaining = Math.max(0, FREE_LIMIT - checksCount);
           var banner = document.getElementById("free-banner");
           if (remaining === 0) {
@@ -65,7 +65,7 @@ document.getElementById("check-form").onsubmit = function(e) {
   document.getElementById("message").className = "message";
   document.getElementById("result-container").innerHTML = "";
 
-  if (!profile.is_premium && checksCount >= FREE_LIMIT) {
+  if (!isPremiumActive(profile) && checksCount >= FREE_LIMIT) {
     document.getElementById("message").textContent = "Bitte upgrade auf Premium.";
     document.getElementById("message").className = "message show error";
     return;

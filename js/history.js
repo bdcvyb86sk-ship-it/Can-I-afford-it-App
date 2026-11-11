@@ -18,8 +18,8 @@ sb.auth.getSession().then(function(result) {
   if (!result.data || !result.data.session) { window.location.href = "index.html"; return; }
   var userId = result.data.session.user.id;
 
-  sb.from("profiles").select("is_premium").eq("id", userId).single().then(function(res) {
-    isPremium = res.data && res.data.is_premium ? true : false;
+  sb.from("profiles").select("is_premium, premium_expires_at").eq("id", userId).single().then(function(res) {
+    isPremium = isPremiumActive(res.data);
 
     sb.from("checks").select("*").eq("user_id", userId).order("created_at", { ascending: false }).then(function(res) {
       allChecks = res.data || [];

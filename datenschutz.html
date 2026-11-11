@@ -86,18 +86,22 @@
 
       <h3>5. Eingesetzte Dienste und Empfänger der Daten</h3>
 
-      <p><strong>5.1 Firebase (Google Ireland Limited)</strong></p>
+      <p><strong>5.1 Supabase (Authentifizierung und Datenbank)</strong></p>
       <p>
-        Für Authentifizierung (Firebase Authentication) und Datenspeicherung
-        (Cloud Firestore) nutzen wir Dienste von Firebase, einem Angebot der Google Ireland
-        Limited, Gordon House, Barrow Street, Dublin 4, Irland, bzw. der Google LLC, USA.
-        Hierbei werden Ihre Account- und Finanzdaten auf Servern von Google gespeichert und
-        verarbeitet. Wir haben mit Google einen Auftragsverarbeitungsvertrag (AVV) gemäß
-        Art. 28 DSGVO abgeschlossen. Soweit Daten in die USA oder andere Drittländer
-        übermittelt werden, erfolgt dies auf Grundlage der EU-Standardvertragsklauseln
-        sowie ggf. weiterer von Google bereitgestellter Garantien. Weitere Informationen:
-        <a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener"
-           style="color: var(--color-accent);">firebase.google.com/support/privacy</a>
+        Für Registrierung und Login (Supabase Auth) sowie die Speicherung Ihrer Daten (Datenbank)
+        nutzen wir Supabase, einen Dienst der Supabase, Inc. Dabei werden Ihre Account-, Finanz- und
+        Nutzungsdaten auf Servern von Supabase bzw. dessen Infrastrukturanbieter (Amazon Web Services)
+        an dem bei der Projekterstellung gewählten Rechenzentrumsstandort gespeichert und verarbeitet.
+        Mit Supabase besteht ein Auftragsverarbeitungsvertrag gemäß Art. 28 DSGVO. Soweit Daten in
+        Drittländer (z. B. die USA) übermittelt werden, erfolgt dies auf Grundlage der
+        EU-Standardvertragsklauseln. Passwörter werden von Supabase nur in verschlüsselter (gehashter)
+        Form gespeichert. Weitere Informationen:
+        <a href="https://supabase.com/privacy" target="_blank" rel="noopener"
+           style="color: var(--color-accent);">supabase.com/privacy</a>
+      </p>
+      <p>
+        Für den Versand von System-E-Mails (z. B. „Passwort zurücksetzen“) nutzen wir den in Supabase
+        eingerichteten E-Mail-Versanddienst.
       </p>
 
       <p><strong>5.2 Digistore24 (Zahlungsabwicklung für Premium-Funktionen)</strong></p>
@@ -109,7 +113,7 @@
         erfolgreichem Kauf übermittelt Digistore24 automatisiert eine Kaufbestätigung (enthält:
         E-Mail-Adresse, Produkt-ID, Bestellnummer, Event-Typ) an unsere Server, auf deren Basis
         Ihr Premium-Zugang automatisch freigeschaltet wird. Vollständige Zahlungs- oder
-        Kartendaten werden uns dabei nicht übermittelt. Es gilt ergänzend die
+        Kartendaten werden uns dabei nicht übermittelt. Beim Aufruf des Checkouts übergeben wir zur Zuordnung Ihres Kaufs Ihre E-Mail-Adresse und eine interne Nutzer-ID an Digistore24. Es gilt ergänzend die
         Datenschutzerklärung von Digistore24:
         <a href="https://www.digistore24.com/page/data-privacy" target="_blank" rel="noopener"
            style="color: var(--color-accent);">digistore24.com/page/data-privacy</a>
@@ -123,6 +127,25 @@
         um die Auslieferung der App technisch zu ermöglichen. Weitere Informationen:
         <a href="https://www.netlify.com/privacy/" target="_blank" rel="noopener"
            style="color: var(--color-accent);">netlify.com/privacy</a>
+      </p>
+
+      <p><strong>5.4 jsDelivr (Content Delivery Network)</strong></p>
+      <p>
+        Zur schnellen und sicheren Bereitstellung von Programmbibliotheken (Supabase-Client,
+        Diagramm-Bibliothek) nutzen wir das Content Delivery Network jsDelivr. Beim Aufruf der App wird
+        dabei Ihre IP-Adresse an den Betreiber übermittelt. Rechtsgrundlage ist unser berechtigtes
+        Interesse an einer stabilen und effizienten Bereitstellung der App (Art. 6 Abs. 1 lit. f DSGVO).
+        Weitere Informationen:
+        <a href="https://www.jsdelivr.com/terms/privacy-policy-jsdelivr-net" target="_blank" rel="noopener"
+           style="color: var(--color-accent);">jsdelivr.com</a>
+      </p>
+
+      <p><strong>5.5 Lokale Speicherung im Browser</strong></p>
+      <p>
+        Nach dem Login speichert die App ein Sitzungs-Token im lokalen Speicher Ihres Browsers
+        (Local Storage), damit Sie angemeldet bleiben. Dieser Zugriff ist technisch erforderlich
+        (§ 25 Abs. 2 Nr. 2 TDDDG) und erfolgt nicht zu Analyse- oder Werbezwecken. Wir setzen keine
+        Tracking- oder Analyse-Dienste ein.
       </p>
 
       <h3>6. Speicherdauer</h3>
@@ -160,7 +183,7 @@
       <p>
         Wir setzen technische und organisatorische Sicherheitsmaßnahmen ein, um Ihre Daten
         gegen zufällige oder vorsätzliche Manipulationen, Verlust, Zerstörung oder den Zugriff
-        unberechtigter Personen zu schützen. Der Zugriff auf Ihre in Firestore gespeicherten
+        unberechtigter Personen zu schützen. Der Zugriff auf Ihre in der Datenbank gespeicherten
         Daten ist durch Sicherheitsregeln so beschränkt, dass ausschließlich Sie als
         authentifizierter Nutzer auf Ihre eigenen Daten zugreifen können. Die Übertragung
         erfolgt verschlüsselt mittels TLS/SSL.
@@ -182,7 +205,7 @@
         jeweils aktuelle Version finden Sie stets an dieser Stelle.
       </p>
 
-      <p style="margin-top: 20px; font-size: 13px;">Stand: Juni 2026</p>
+      <p style="margin-top: 20px; font-size: 13px;">Stand: November 2026</p>
     </div>
 
     <a href="index.html" class="btn btn-secondary mt-24">Zurück</a>
