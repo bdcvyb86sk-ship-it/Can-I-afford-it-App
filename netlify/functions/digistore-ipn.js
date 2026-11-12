@@ -15,7 +15,14 @@ const REVOKE_EVENTS = ["on_refund", "refund", "on_chargeback", "chargeback"];
 const GRACE_DAYS = 3;
 
 function env(name) {
-  return String(process.env[name] || "").trim();
+  return String(process.env[name] || "").trim().replace(/^["']+|["']+$/g, "").trim();
+}
+
+// Supabase-Adresse tolerant lesen: fehlendes https:// ergaenzen, Schraegstrich/rest-Pfad am Ende entfernen
+function supabaseBase() {
+  var u = env("SUPABASE_URL");
+  if (u && !/^https?:\/\//i.test(u)) u = "https://" + u;
+  return u.replace(/\/+$/, "").replace(/\/rest\/v1$/i, "");
 }
 
 function parseBody(event) {
@@ -80,7 +87,7 @@ function expiryFor(plan) {
 
 // --- Supabase REST ---
 async function rest(method, path, body, prefer) {
-  var base = env("SUPABASE_URL").replace(/\/+$/, "");
+  var base = supabaseBase();
   var key = env("SUPABASE_SERVICE_KEY");
   var headers = { apikey: key, "Content-Type": "application/json" };
   if (key.indexOf("eyJ") === 0) headers.Authorization = "Bearer " + key; // nur bei alten JWT-Keys
@@ -131,6 +138,15 @@ exports.handler = async function (event) {
       return { statusCode: 500, body: "Config error" };
     }
 
+    try {
+      var host = new URL(supabaseBase()).hostname;
+      if (!/^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(host)) throw new Error("ungueltiger Host");
+      console.log("Supabase-Host:", host);
+    } catch (e) {
+      console.error("SUPABASE_URL ist keine gueltige Adresse (Beginn: " + env("SUPABASE_URL").slice(0, 12) + ")");
+      return { statusCode: 500, body: "Config error" };
+    }
+
     var email = String(params.email || params.buyer_email || params.customer_email || params.billing_email || "").toLowerCase().trim();
     var plan = PRODUCT_PLANS[String(params.product_id || "")] || null;
     var custom = String(params.custom || "").trim();
@@ -176,4 +192,3 @@ exports.handler = async function (event) {
     return { statusCode: 500, body: "Server error" };
   }
 };
-
