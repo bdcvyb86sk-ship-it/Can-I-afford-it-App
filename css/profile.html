@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Profil – Can I Afford It?</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Can I Afford It" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+</head>
+<body>
+  <div id="loader" class="loader"><div class="spinner"></div></div>
+  <div id="app" class="app-container hidden">
+    <div class="topbar"><h1>Profil</h1></div>
+    <div id="message" class="message"></div>
+    <div id="premium-section"></div>
+
+    <form id="profile-form">
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" id="profile-name" required />
+      </div>
+      <div class="form-group">
+        <label>E-Mail</label>
+        <input type="email" id="profile-email" disabled />
+      </div>
+      <div class="form-group">
+        <label>Monatliches Nettoeinkommen</label>
+        <div class="currency-input-wrapper">
+          <input type="number" id="profile-income" min="0" step="0.01" required />
+          <span class="currency-suffix">€</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Monatliche Fixkosten</label>
+        <div class="currency-input-wrapper">
+          <input type="number" id="profile-fixed" min="0" step="0.01" required />
+          <span class="currency-suffix">€</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Monatliches Sparziel</label>
+        <div class="currency-input-wrapper">
+          <input type="number" id="profile-savings" min="0" step="0.01" required />
+          <span class="currency-suffix">€</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Aktueller Kontostand</label>
+        <div class="currency-input-wrapper">
+          <input type="number" id="profile-balance" step="0.01" required />
+          <span class="currency-suffix">€</span>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Änderungen speichern</button>
+    </form>
+
+    <button id="logout-btn" class="btn btn-danger mt-24">Abmelden</button>
+    <a href="https://www.digistore24.com/de/cancel-revoke-contract" target="_blank" rel="noopener" class="btn-link" style="display:block;text-decoration:none;">Verträge hier kündigen</a>
+    <button id="delete-btn" class="btn-link" style="color:var(--color-red);">Konto löschen</button>
+
+    <div class="text-center" style="margin-top:24px;font-size:12px;padding-bottom:20px;">
+      <a href="impressum.html" style="color:var(--color-text-secondary);margin-right:12px;">Impressum</a>
+      <a href="datenschutz.html" style="color:var(--color-text-secondary);">Datenschutz</a>
+      <a href="agb.html" style="color:var(--color-text-secondary);margin-left:12px;">AGB</a>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="delete-modal">
+    <div class="modal-box">
+      <h3>Konto endgültig löschen?</h3>
+      <p>Dein Konto und alle gespeicherten Daten (Profil, Prüfungen, Fixkosten) werden unwiderruflich gelöscht. Ein laufendes Premium-Abo kündigst du separat bei Digistore24. Tippe zur Bestätigung <strong>LÖSCHEN</strong>.</p>
+      <input type="text" id="delete-confirm-input" placeholder="LÖSCHEN" autocomplete="off" autocapitalize="characters" />
+      <div id="delete-error" class="message" style="margin-top:12px;"></div>
+      <div class="modal-actions" style="margin-top:12px;">
+        <button class="btn btn-secondary" id="delete-cancel">Abbrechen</button>
+        <button class="btn btn-danger" id="delete-confirm" disabled>Löschen</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="logout-modal">
+    <div class="modal-box">
+      <h3>Abmelden?</h3>
+      <p>Du wirst zur Login-Seite weitergeleitet.</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="logout-cancel">Abbrechen</button>
+        <button class="btn btn-danger" id="logout-confirm">Abmelden</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span><span>Dashboard</span></a>
+    <a href="check.html" class="nav-item"><span class="nav-icon">🛒</span><span>Prüfen</span></a>
+    <a href="history.html" class="nav-item"><span class="nav-icon">📜</span><span>Historie</span></a>
+    <a href="stats.html" class="nav-item"><span class="nav-icon">📊</span><span>Statistiken</span></a>
+    <a href="profile.html" class="nav-item active"><span class="nav-icon">👤</span><span>Profil</span></a>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/profile.js"></script>
+</body>
+</html>
