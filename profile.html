@@ -62,11 +62,26 @@
     </form>
 
     <button id="logout-btn" class="btn btn-danger mt-24">Abmelden</button>
+    <a href="https://www.digistore24.com/de/cancel-revoke-contract" target="_blank" rel="noopener" class="btn-link" style="display:block;text-decoration:none;">Verträge hier kündigen</a>
+    <button id="delete-btn" class="btn-link" style="color:var(--color-red);">Konto löschen</button>
 
     <div class="text-center" style="margin-top:24px;font-size:12px;padding-bottom:20px;">
       <a href="impressum.html" style="color:var(--color-text-secondary);margin-right:12px;">Impressum</a>
       <a href="datenschutz.html" style="color:var(--color-text-secondary);">Datenschutz</a>
       <a href="agb.html" style="color:var(--color-text-secondary);margin-left:12px;">AGB</a>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="delete-modal">
+    <div class="modal-box">
+      <h3>Konto endgültig löschen?</h3>
+      <p>Dein Konto und alle gespeicherten Daten (Profil, Prüfungen, Fixkosten) werden unwiderruflich gelöscht. Ein laufendes Premium-Abo kündigst du separat bei Digistore24. Tippe zur Bestätigung <strong>LÖSCHEN</strong>.</p>
+      <input type="text" id="delete-confirm-input" placeholder="LÖSCHEN" autocomplete="off" autocapitalize="characters" />
+      <div id="delete-error" class="message" style="margin-top:12px;"></div>
+      <div class="modal-actions" style="margin-top:12px;">
+        <button class="btn btn-secondary" id="delete-cancel">Abbrechen</button>
+        <button class="btn btn-danger" id="delete-confirm" disabled>Löschen</button>
+      </div>
     </div>
   </div>
 

@@ -90,3 +90,42 @@ document.getElementById("logout-modal").onclick = function(e) {
 document.getElementById("logout-confirm").onclick = function() {
   sb.auth.signOut().then(function() { window.location.href = "index.html"; });
 };
+
+
+// ---- Konto löschen ----
+(function () {
+  var openBtn = document.getElementById("delete-btn");
+  if (!openBtn) return;
+  var modal = document.getElementById("delete-modal");
+  var input = document.getElementById("delete-confirm-input");
+  var confirmBtn = document.getElementById("delete-confirm");
+  var errBox = document.getElementById("delete-error");
+
+  openBtn.onclick = function () {
+    input.value = "";
+    confirmBtn.disabled = true;
+    errBox.className = "message";
+    modal.classList.add("show");
+  };
+  document.getElementById("delete-cancel").onclick = function () { modal.classList.remove("show"); };
+  modal.onclick = function (e) { if (e.target === modal) modal.classList.remove("show"); };
+  input.oninput = function () {
+    var v = input.value.trim().toUpperCase();
+    confirmBtn.disabled = !(v === "LÖSCHEN" || v === "LOESCHEN");
+  };
+  confirmBtn.onclick = function () {
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = "Wird gelöscht…";
+    sb.rpc("delete_my_account").then(function (res) {
+      if (res.error) {
+        errBox.textContent = "Löschen fehlgeschlagen: " + res.error.message;
+        errBox.className = "message show error";
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = "Löschen";
+        return;
+      }
+      var goLogin = function () { window.location.href = "index.html"; };
+      sb.auth.signOut({ scope: "local" }).then(goLogin, goLogin);
+    });
+  };
+})();
