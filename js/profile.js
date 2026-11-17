@@ -37,6 +37,7 @@ sb.auth.getSession().then(function(result) {
       document.getElementById("profile-fixed").value = profile.fixed_costs || 0;
       document.getElementById("profile-savings").value = profile.savings_goal || 0;
       document.getElementById("profile-balance").value = profile.current_balance || 0;
+      document.getElementById("profile-payday").value = clampPayDay(profile.pay_day);
       renderPremium(isPremiumActive(profile));
     }
     document.getElementById("loader").classList.add("hidden");
@@ -50,6 +51,7 @@ sb.auth.getSession().then(function(result) {
     var fixed_costs = parseFloat(document.getElementById("profile-fixed").value);
     var savings_goal = parseFloat(document.getElementById("profile-savings").value);
     var current_balance = parseFloat(document.getElementById("profile-balance").value);
+    var pay_day = clampPayDay(document.getElementById("profile-payday").value);
 
     if (!name || [income, fixed_costs, savings_goal, current_balance].some(isNaN)) {
       showMessage("Bitte alle Felder korrekt ausfüllen."); return;
@@ -60,7 +62,7 @@ sb.auth.getSession().then(function(result) {
 
     sb.from("profiles").upsert({
       id: userId, name: name, income: income,
-      fixed_costs: fixed_costs, savings_goal: savings_goal, current_balance: current_balance
+      fixed_costs: fixed_costs, savings_goal: savings_goal, current_balance: current_balance, pay_day: pay_day
     }, { onConflict: "id" }).then(function(res) {
       if (res.error) { showMessage("Speichern fehlgeschlagen."); }
       else { showToast("Profil aktualisiert ✓"); }
@@ -74,7 +76,7 @@ function renderPremium(isPremium) {
   if (isPremium) {
     section.innerHTML = '<div class="premium-card"><div class="premium-title">⭐ Du bist Premium-Mitglied</div><ul><li>Unbegrenzte Kaufprüfungen</li><li>Statistiken &amp; Charts</li><li>CSV Export</li><li>Fixkosten-Manager</li></ul></div>';
   } else {
-    section.innerHTML = '<div class="premium-card"><div class="premium-title">⭐ Premium freischalten</div><p style="color:var(--color-text-secondary);font-size:14px;">Erweiterte Funktionen für deine Finanzplanung.</p><ul><li>Unbegrenzte Kaufprüfungen (Free: 3/Monat)</li><li>Statistiken &amp; Charts</li><li>CSV Export</li><li>Fixkosten-Manager</li></ul><div class="plan-grid"><a href="' + DS24.monthly + checkoutParams + '" target="_blank" rel="noopener" class="plan-option"><div class="plan-left"><span class="plan-name">Monatlich</span><span class="plan-sub">Jederzeit kündbar</span></div><div class="plan-price">4,99 €<span class="plan-period">/ Monat</span></div></a><a href="' + DS24.yearly + checkoutParams + '" target="_blank" rel="noopener" class="plan-option recommended"><div class="plan-left"><span class="plan-name">Jährlich <span class="plan-tag">SPARE 33%</span></span><span class="plan-sub">39,99 € pro Jahr</span></div><div class="plan-price">3,33 €<span class="plan-period">/ Monat</span></div></a><a href="' + DS24.forever + checkoutParams + '" target="_blank" rel="noopener" class="plan-option"><div class="plan-left"><span class="plan-name">Forever</span><span class="plan-sub">Einmalzahlung</span></div><div class="plan-price">69 €<span class="plan-period">einmalig</span></div></a></div><p style="font-size:12px;color:var(--color-text-secondary);margin-top:8px;">Sichere Zahlung über Digistore24. Premium wird automatisch freigeschaltet.</p></div>';
+    section.innerHTML = '<div class="premium-card"><div class="premium-title">⭐ Premium freischalten</div><p style="color:var(--color-text-secondary);font-size:14px;">Erweiterte Funktionen für deine Finanzplanung.</p><ul><li>Unbegrenzte Kaufprüfungen (Free: 5/Monat)</li><li>Statistiken &amp; Charts</li><li>CSV Export</li><li>Fixkosten-Manager</li></ul><div class="plan-grid"><a href="' + DS24.monthly + checkoutParams + '" target="_blank" rel="noopener" class="plan-option"><div class="plan-left"><span class="plan-name">Monatlich</span><span class="plan-sub">Jederzeit kündbar</span></div><div class="plan-price">4,99 €<span class="plan-period">/ Monat</span></div></a><a href="' + DS24.yearly + checkoutParams + '" target="_blank" rel="noopener" class="plan-option recommended"><div class="plan-left"><span class="plan-name">Jährlich <span class="plan-tag">SPARE 33%</span></span><span class="plan-sub">39,99 € pro Jahr</span></div><div class="plan-price">3,33 €<span class="plan-period">/ Monat</span></div></a><a href="' + DS24.forever + checkoutParams + '" target="_blank" rel="noopener" class="plan-option"><div class="plan-left"><span class="plan-name">Forever</span><span class="plan-sub">Einmalzahlung</span></div><div class="plan-price">69 €<span class="plan-period">einmalig</span></div></a></div><p style="font-size:12px;color:var(--color-text-secondary);margin-top:8px;">Sichere Zahlung über Digistore24. Premium wird automatisch freigeschaltet.</p></div>';
   }
 }
 

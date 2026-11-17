@@ -1,5 +1,5 @@
 // js/history.js
-var FREE_LIMIT = 3;
+var FREE_LIMIT = 5;
 var allChecks = [];
 var activeFilter = "all";
 var isPremium = false;
@@ -9,10 +9,10 @@ var fmt = function(v) {
 };
 var fmtDate = function(s) {
   if (!s) return "";
-  return new Intl.DateTimeFormat("de-DE", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" }).format(new Date(s));
+  return new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(s));
 };
 var statusLabels = { safe: "Problemlos", warning: "Knapp", danger: "Lieber nicht" };
-var categoryIcons = { Elektronik:"📱", Kleidung:"👕", Freizeit:"🎮", Reisen:"✈️", Wohnen:"🛋️", Essen:"🍔", Sonstiges:"🧩" };
+var categoryIcons = { Elektronik: "📱", Kleidung: "👕", Freizeit: "🎮", Reisen: "✈️", Wohnen: "🛋️", Essen: "🍔", Sonstiges: "🧩" };
 
 sb.auth.getSession().then(function(result) {
   if (!result.data || !result.data.session) { window.location.href = "index.html"; return; }
@@ -21,8 +21,8 @@ sb.auth.getSession().then(function(result) {
   sb.from("profiles").select("is_premium, premium_expires_at").eq("id", userId).single().then(function(res) {
     isPremium = isPremiumActive(res.data);
 
-    sb.from("checks").select("*").eq("user_id", userId).order("created_at", { ascending: false }).then(function(res) {
-      allChecks = res.data || [];
+    sb.from("checks").select("*").eq("user_id", userId).order("created_at", { ascending: false }).then(function(cres) {
+      allChecks = cres.data || [];
       document.getElementById("loader").classList.add("hidden");
       document.getElementById("app").classList.remove("hidden");
       renderList();
@@ -37,6 +37,24 @@ document.getElementById("filter-tabs").onclick = function(e) {
   tab.classList.add("active");
   activeFilter = tab.dataset.filter;
   renderList();
+};
+
+// "Als gekauft markieren" / "Zurücknehmen"
+document.getElementById("history-list").onclick = function(e) {
+  var btn = e.target.closest("[data-act]");
+  if (!btn) return;
+  var id = btn.dataset.id;
+  var patch = btn.dataset.act === "buy"
+    ? { purchased: true, purchased_at: new Date().toISOString() }
+    : { purchased: null, purchased_at: null };
+  btn.disabled = true;
+  sb.from("checks").update(patch).eq("id", id).then(function(res) {
+    if (res.error) { btn.disabled = false; btn.textContent = "Fehlgeschlagen – bitte erneut versuchen"; return; }
+    allChecks.forEach(function(c) {
+      if (c.id === id) { c.purchased = patch.purchased; c.purchased_at = patch.purchased_at; }
+    });
+    renderList();
+  });
 };
 
 function renderList() {
@@ -60,7 +78,12 @@ function renderList() {
     var el = document.createElement("div");
     el.className = "history-item";
     var d = document.createElement("div"); d.textContent = c.product_name;
-    el.innerHTML = '<div class="info"><div class="name">' + icon + ' ' + d.innerHTML + '</div><div class="date">' + fmtDate(c.created_at) + '</div><span class="badge ' + c.status + '">' + (statusLabels[c.status] || c.status) + '</span></div><div class="amount">' + fmt(c.purchase_amount) + '</div>';
+    var buyState = c.purchased === true ? "✅ Gekauft" : (c.purchased === false ? "Nicht gekauft" : "Offen");
+    var btnStyle = 'width:auto;margin:6px 0 0;padding:0;font-size:13px;text-align:left;';
+    var actionBtn = c.purchased === true
+      ? '<button type="button" class="btn-link" data-act="undo" data-id="' + c.id + '" style="' + btnStyle + '">Zurücknehmen</button>'
+      : '<button type="button" class="btn-link" data-act="buy" data-id="' + c.id + '" style="' + btnStyle + '">Als gekauft markieren</button>';
+    el.innerHTML = '<div class="info"><div class="name">' + icon + ' ' + d.innerHTML + '</div><div class="date">' + fmtDate(c.created_at) + '</div><span class="badge ' + c.status + '">' + (statusLabels[c.status] || c.status) + '</span> <span style="font-size:12px;color:var(--color-text-secondary);margin-left:6px;">' + buyState + '</span><div>' + actionBtn + '</div></div><div class="amount">' + fmt(c.purchase_amount) + '</div>';
     list.appendChild(el);
   });
 

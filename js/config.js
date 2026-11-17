@@ -43,3 +43,39 @@ if (isNativeApp) {
     });
   } catch (e) { /* ignorieren */ }
 }
+
+// ---- Abrechnungszeitraum ab Zahltag ----
+function clampPayDay(v) {
+  var n = parseInt(v, 10);
+  if (isNaN(n)) return 1;
+  return Math.min(Math.max(n, 1), 28);
+}
+function periodStart(payDay, ref) {
+  var d = ref ? new Date(ref) : new Date();
+  var pd = clampPayDay(payDay);
+  var start = new Date(d.getFullYear(), d.getMonth(), pd, 0, 0, 0, 0);
+  if (d < start) start = new Date(d.getFullYear(), d.getMonth() - 1, pd, 0, 0, 0, 0);
+  return start;
+}
+function periodEnd(payDay, ref) {
+  var s = periodStart(payDay, ref);
+  return new Date(s.getFullYear(), s.getMonth() + 1, s.getDate(), 0, 0, 0, 0);
+}
+function fmtDay(d) {
+  return d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" });
+}
+// Summe der als "gekauft" markierten Betraege im aktuellen Zeitraum
+function loadSpent(userId, payDay) {
+  var start = periodStart(payDay);
+  var end = periodEnd(payDay);
+  return sb.from("checks").select("purchase_amount, purchased_at, created_at")
+    .eq("user_id", userId).eq("purchased", true).limit(1000)
+    .then(function (res) {
+      var sum = 0;
+      (res.data || []).forEach(function (c) {
+        var d = new Date(c.purchased_at || c.created_at);
+        if (d >= start && d < end) sum += Number(c.purchase_amount) || 0;
+      });
+      return { spent: sum, start: start, end: end };
+    });
+}
